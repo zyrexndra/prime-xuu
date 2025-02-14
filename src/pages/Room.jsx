@@ -118,7 +118,7 @@ const Room = () => {
         setShowToast(true);
         document.querySelector('[data-dialog-close]').click();
         setTimeout(() => setShowToast(false), 3000);
-      }
+      
     } catch (error) {
       console.error('Error saving comment:', error);
     }
