@@ -41,14 +41,10 @@ const Room = () => {
     loadComments();
   }, []);
 
-  const loadComments = async () => {
-    try {
-      const response = await fetch('/api/comments');
-      const data = await response.json();
-      setComments(data);
-    } catch (error) {
-      console.error('Error loading comments:', error);
-    }
+  // In-memory comments storage
+  const loadComments = () => {
+    const savedComments = JSON.parse(localStorage.getItem('comments') || '[]');
+    setComments(savedComments);
   };
 
   const searchSpotify = async (query) => {
@@ -110,16 +106,11 @@ const Room = () => {
     };
 
     try {
-      const response = await fetch('/api/comments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(comment),
-      });
-
-      if (response.ok) {
-        await loadComments();
+      const currentComments = JSON.parse(localStorage.getItem('comments') || '[]');
+      const newComment = { ...comment, id: Date.now() };
+      const updatedComments = [...currentComments, newComment];
+      localStorage.setItem('comments', JSON.stringify(updatedComments));
+      setComments(updatedComments);
         setNewComment('');
         setName('');
         setSelectedSong(null);
