@@ -8,22 +8,9 @@
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
-  ],
-  "redirects": [
-    { "source": "/public/(.*)", "destination": "/public/$1", "statusCode": 200 }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    }
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/public", "dest": "/index.html" }
   ],
   "cleanUrls": true,
-  "trailingSlash": false,
-  "static": {
-    "directoryListing": false
-  }
+  "trailingSlash": false
 }
