@@ -65,38 +65,12 @@ const Room = () => {
     }
   };
 
-  useEffect(() => {
-    // Load Turnstile script
-    const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-    script.async = true;
-    document.head.appendChild(script);
-    return () => document.head.removeChild(script);
-  }, []);
-
+  
   const handleComment = async () => {
     if (!newComment.trim() || !name.trim()) return;
 
-    // Reset any existing widgets
-    window.turnstile.reset('#turnstile-container');
-
-    // Get turnstile token
-    let widgetId = null;
-    const token = await new Promise((resolve) => {
-      widgetId = window.turnstile.render('#turnstile-container', {
-        sitekey: '0x4AAAAAAA8yFAs5gOzsQ5YL',
-        callback: (token) => {
-          resolve(token);
-          // Remove the widget after successful verification
-          window.turnstile.remove(widgetId);
-        },
-      });
-    });
-
-    if (!token) {
-      alert('Please complete the captcha');
-      return;
-    }
+    
+    
 
     const comment = {
       name: name,
@@ -115,9 +89,8 @@ const Room = () => {
         setName('');
         setSelectedSong(null);
         setSearchQuery('');
-        setShowToast(true);
         document.querySelector('[data-dialog-close]').click();
-        setTimeout(() => setShowToast(false), 3000);
+        
       
     } catch (error) {
       console.error('Error saving comment:', error);
@@ -245,7 +218,7 @@ const Room = () => {
                       className="w-full bg-gray-800 p-3 rounded-lg resize-none h-32 focus:outline-none focus:ring-2 ring-purple-500 border border-white/10 text-white"
                     />
 
-                    <div id="turnstile-container" className="flex justify-center my-4"></div>
+                
 
                     <button
                       onClick={handleComment}
