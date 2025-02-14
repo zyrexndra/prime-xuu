@@ -81,11 +81,19 @@ const Room = () => {
   const handleComment = async () => {
     if (!newComment.trim() || !name.trim()) return;
 
+    // Reset any existing widgets
+    window.turnstile.reset('#turnstile-container');
+
     // Get turnstile token
+    let widgetId = null;
     const token = await new Promise((resolve) => {
-      window.turnstile.render('#turnstile-container', {
+      widgetId = window.turnstile.render('#turnstile-container', {
         sitekey: '0x4AAAAAAA8yFAs5gOzsQ5YL',
-        callback: resolve,
+        callback: (token) => {
+          resolve(token);
+          // Remove the widget after successful verification
+          window.turnstile.remove(widgetId);
+        },
       });
     });
 
