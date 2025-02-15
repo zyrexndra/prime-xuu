@@ -3,9 +3,9 @@ import * as Dialog from '@radix-ui/react-dialog';
 import * as ScrollArea from '@radix-ui/react-scroll-area';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { FaSpotify, FaUser, FaSearch } from 'react-icons/fa';
-import { ChatBubbleIcon, PersonIcon, PaperPlaneIcon, RocketIcon } from '@radix-ui/react-icons';
 
+import { FaSpotify, FaSearch } from 'react-icons/fa';
+import { ChatBubbleIcon, PersonIcon, PaperPlaneIcon, Cross2Icon } from '@radix-ui/react-icons';
 const Room = () => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -15,6 +15,10 @@ const Room = () => {
   const [selectedSong, setSelectedSong] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
+  const [spotifyEmbed, setSpotifyEmbed] = useState(null);
+  const [isEmbedLoading, setIsEmbedLoading] = useState(false);
 
   useEffect(() => {
     const getSpotifyToken = async () => {
@@ -41,10 +45,14 @@ const Room = () => {
     loadComments();
   }, []);
 
-  // In-memory comments storage
-  const loadComments = () => {
-    const savedComments = JSON.parse(localStorage.getItem('comments') || '[]');
-    setComments(savedComments);
+  const loadComments = async () => {
+    try {
+      const response = await axios.get('https://ruloaooa-hooh.hf.space/api/comments', { withCredentials: true });
+      setComments(response.data);
+    } catch (error) {
+      console.error('Error loading comments:', error);
+      setComments([]);
+    }
   };
 
   const searchSpotify = async (query) => {
@@ -65,14 +73,25 @@ const Room = () => {
     }
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
   
   const handleComment = async () => {
     if (!newComment.trim() || !name.trim()) return;
-
     
-    
+    // Anti-spam: Check if less than 30 seconds have passed since last submission
+    const now = Date.now();
+    if (now - lastSubmitTime < 120000) {
+      setShowToast(true);
+      setToastMessage("Please wait 2 minutes before sending another message");
+      setToastType("error");
+      setTimeout(() => setShowToast(false), 3000);
+      return;
+    }
 
+    setIsSubmitting(true);
     const comment = {
+      id: Date.now().toString(),
       name: name,
       text: newComment,
       song: selectedSong,
@@ -80,25 +99,35 @@ const Room = () => {
     };
 
     try {
-      const currentComments = JSON.parse(localStorage.getItem('comments') || '[]');
-      const newComment = { ...comment, id: Date.now() };
-      const updatedComments = [...currentComments, newComment];
-      localStorage.setItem('comments', JSON.stringify(updatedComments));
-      setComments(updatedComments);
-        setNewComment('');
-        setName('');
-        setSelectedSong(null);
-        setSearchQuery('');
-        document.querySelector('[data-dialog-close]').click();
-        
-      
+      const response = await axios.post('https://ruloaooa-hooh.hf.space/api/comments', comment, { 
+        withCredentials: true 
+      });
+      setComments(prev => [response.data, ...prev]);
+      setNewComment('');
+      setName('');
+      setSelectedSong(null);
+      setSearchQuery('');
+      setLastSubmitTime(now);
+      setIsSubmitting(false);
+      alert('Message sent successfully!');
+      const dialog = document.querySelector('[role="dialog"]')?.parentElement;
+      if (dialog) {
+        dialog.remove();
+      }
+      //document.querySelector('.backdrop-blur-sm')?.remove();
     } catch (error) {
       console.error('Error saving comment:', error);
+      alert('Failed to send message. Please try again.');
     }
   };
 
+  const openSpotifyEmbed = (trackId) => {
+    setIsEmbedLoading(true);
+    setSpotifyEmbed(trackId);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-black text-white pb-10">
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -137,8 +166,8 @@ const Room = () => {
               </Dialog.Trigger>
 
               <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-sm" />
-                <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-900 p-6 rounded-xl w-[90vw] max-w-md border border-white/10">
+                <Dialog.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40" />
+                <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-900 p-6 rounded-xl w-[90vw] max-w-xl border border-white/10 z-40">
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 bg-gray-800 p-3 rounded-lg border border-white/10">
                       <PersonIcon className="w-5 h-5 text-purple-400" />
@@ -218,7 +247,6 @@ const Room = () => {
                       className="w-full bg-gray-800 p-3 rounded-lg resize-none h-32 focus:outline-none focus:ring-2 ring-purple-500 border border-white/10 text-white"
                     />
 
-                
 
                     <button
                       onClick={handleComment}
@@ -235,9 +263,9 @@ const Room = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg"
+                className={`fixed top-4 left-1/2 -translate-x-1/2 ${toastType === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-3 rounded-lg shadow-lg z-[100]`}
               >
-                Message sent successfully!
+                {toastMessage}
               </motion.div>
             )}
           </motion.div>
@@ -248,9 +276,9 @@ const Room = () => {
             animate={{ x: 0, opacity: 1 }}
             className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl border border-white/10"
           >
-            <ScrollArea.Root className="h-[260px]">
-              <ScrollArea.Viewport className="h-full p-6">
-                <div className="space-y-4 mb-4">
+            <ScrollArea.Root className="h-[400px]">
+              <ScrollArea.Viewport className="h-full p-4">
+                <div className="space-y-6 mb-4">
                   {comments.map((comment) => (
                     <motion.div
                       key={comment.id}
@@ -264,8 +292,10 @@ const Room = () => {
                       </div>
                       <p className="text-gray-300 mb-3">{comment.text}</p>
                       {comment.song && (
-                        <div className="flex items-center gap-3 bg-black/30 p-2 rounded-lg relative">
-                          <FaSpotify className="absolute top-2 right-2 w-4 h-4 text-green-400" />
+                        <div 
+                          onClick={() => openSpotifyEmbed(comment.song.id)}
+                          className="flex items-center gap-3 bg-black/30 p-2 rounded-lg relative cursor-pointer hover:bg-black/50"
+                        >
                           <img src={comment.song.album.images[2]?.url} className="w-10 h-10 rounded" alt={comment.song.name} />
                           <div className="flex-1">
                             <p className="font-medium">{comment.song.name}</p>
@@ -287,14 +317,85 @@ const Room = () => {
                 <ScrollArea.Thumb className="bg-purple-500/50 rounded-full" />
               </ScrollArea.Scrollbar>
             </ScrollArea.Root>
-            <div className="p-4 border-t border-white/10 bg-white/5">
-              <p className="text-center text-sm text-gray-400">
-                {comments.length} messages shared
-              </p>
-            </div>
+            
           </motion.div>
         </div>
       </motion.div>
+
+      {/* Spotify Embed Dialog */}
+      <Dialog.Root open={!!spotifyEmbed} onOpenChange={() => setSpotifyEmbed(null)}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-sm" />
+          <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-900 p-6 rounded-xl w-[90vw] max-w-xl border border-white/10">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-white">Preview Songs</h3>
+              <button onClick={() => setSpotifyEmbed(null)} className="text-gray-400 hover:text-white">
+                <Cross2Icon />
+              </button>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              className="relative"
+            >
+              <AnimatePresence>
+                {isEmbedLoading && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm z-10"
+                  >
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full"
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <iframe
+                src={`https://open.spotify.com/embed/track/${spotifyEmbed}`}
+                width="100%"
+                height="352"
+                frameBorder="0"
+                allowFullScreen
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+                onLoad={() => setIsEmbedLoading(false)}
+                className="bg-black/20"
+              />
+            </motion.div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    <motion.footer
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent backdrop-blur-sm"
+      >
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <motion.p 
+              initial={{ x: -20 }}
+              animate={{ x: 0 }}
+              className="text-sm text-gray-400"
+            >
+              Total comments: {comments.length > 0 ? comments.length : 0}
+            </motion.p>
+            <motion.div 
+              initial={{ x: 20 }}
+              animate={{ x: 0 }}
+              className="flex items-center gap-2"
+            >
+              <FaSpotify className="text-green-500 w-4 h-4" />
+              <span className="text-sm text-gray-400">Share your favorite songs</span>
+            </motion.div>
+          </div>
+        </div>
+      </motion.footer>
     </div>
   );
 };
