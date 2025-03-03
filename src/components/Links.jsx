@@ -4,7 +4,7 @@ import { HiArrowRight } from "react-icons/hi";
 
 const links = [
   { title: "Personal Website", description: "About me.", url: "https://rulpshilat.my.id", icon: "🌐" },
-  { title: "XUUDev BOT", description: "Confess your feelings through Izumi bot", url: "https://wa.me/6283821190464?text=.menu", icon: "⚡" },
+  { title: "XUUDev BOT", description: "Confess your feelings through xuu bot", url: "https://wa.me/6283821190464?text=.menu", icon: "⚡" },
   { title: "XUUDev Circle", description: "Find your online chat friends.", url: "https://whatsapp.com/channel/0029VavnhiVKWEKxclqvyR2t", icon: "🕊️" },
   { title: "Donate", description: "Donate as you wish.", url: "https://saweria.co/primexuu", icon: "💰" },
   { 
