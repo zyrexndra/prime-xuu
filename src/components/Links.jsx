@@ -4,16 +4,16 @@ import { HiArrowRight } from "react-icons/hi";
 
 const links = [
   { title: "Personal Website", description: "About me.", url: "https://rulpshilat.my.id", icon: "🌐" },
-  { title: "Izumii BOT", description: "Confess your feelings through Izumi bot", url: "https://wa.me/6287740175435?text=.confess", icon: "🪐" },
-  { title: "Izumii Circle", description: "Find your online chat friends.", url: "https://chat.whatsapp.com/CvY5sQ0jJku3SzVlfGpVzo", icon: "🕊️" },
-  { title: "Donate", description: "Donate as you wish.", url: "https://saweria.co/RullZY", icon: "💰" },
+  { title: "XUUDev BOT", description: "Confess your feelings through Izumi bot", url: "https://wa.me/6283821190464?text=.menu", icon: "⚡" },
+  { title: "XUUDev Circle", description: "Find your online chat friends.", url: "https://whatsapp.com/channel/0029VavnhiVKWEKxclqvyR2t", icon: "🕊️" },
+  { title: "Donate", description: "Donate as you wish.", url: "https://saweria.co/primexuu", icon: "💰" },
   { 
     title: "Currently Playing", 
     isSpotify: true,
-    songTitle: "Sang Guru",
-    artist: "Panji Sakti",
+    songTitle: "We Don't Talk Anymore",
+    artist: "Charlie Puth",
     albumArt: "https://i.scdn.co/image/ab67616d0000b27365301d1de03fcb8b34ca9a66",
-    url: "https://open.spotify.com/track/1EotuKw4i0ckPIPOYOi8Cm?si=EjlfJEykTdOw3V21ztHwVg"
+    url: "https://open.spotify.com/track/70hbZkds7qZbZDWhJPfyfE?si=VlC9B1ScR3CZr4Jd7U9Y5Q"
   }
 ];
 
