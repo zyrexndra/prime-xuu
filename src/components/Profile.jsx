@@ -29,13 +29,13 @@ const Profile = () => {
           <span className="bg-white/5 px-3 py-1 rounded-full text-xs hover:bg-white/10 transition-all hover:scale-105 ring-1 ring-yellow-500">Music</span>
         </div>
         <div className="flex justify-center gap-4 mt-4 text-xl text-gray-400">
-          <a href="https://instagram.com/4rllzyy_" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-zinc-100 transition-colors">
+          <a href="https://www.instagram.com/zyrexndra" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-zinc-100 transition-colors">
             <FaInstagram className="h-5 w-5 text-pink-600" />
           </a>
-          <a href="https://github.com/rlzyy" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-zinc-100 transition-colors">
+          <a href="https://github.com/zyrexndra/Primexuu" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-zinc-100 transition-colors">
             <FaGithub className="h-5 w-5 text-gray-600" />
           </a>
-          <a href="https://open.spotify.com/playlist/1K1Sz1NldB7G8Bibs5GZuI?si=Q7EEsgOSS06YST1IaIXYPg" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-zinc-100 transition-colors">
+          <a href="https://open.spotify.com/playlist/7CYp3ACMaochziBfs2jCHw?si=z7UL38GlT6Gea03V6aeszQ" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-zinc-100 transition-colors">
             <FaSpotify className="h-5 w-5 text-green-600" />
           </a>
         </div>
